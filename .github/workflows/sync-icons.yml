@@ -24,7 +24,9 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Clone upstream
-        run: git clone --depth 1 https://github.com/google/material-design-icons.git /tmp/material-design-icons
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/google/material-design-icons.git /tmp/material-design-icons
+          git -C /tmp/material-design-icons sparse-checkout set symbols/web
 
       - name: Generate icons
         run: node scripts/generate-icons.js --repo /tmp/material-design-icons
