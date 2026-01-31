@@ -70,6 +70,53 @@ jobs:
             sed -i '/_authToken/d' "$NPM_CONFIG_USERCONFIG"
           fi
 
+      - name: OIDC debug
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          echo "OIDC URL set: ${ACTIONS_ID_TOKEN_REQUEST_URL:+yes}"
+          echo "OIDC token set: ${ACTIONS_ID_TOKEN_REQUEST_TOKEN:+yes}"
+          node - <<'NODE'
+          const https = require("https");
+          const url = `${process.env.ACTIONS_ID_TOKEN_REQUEST_URL}&audience=npm`;
+          const req = https.get(
+            url,
+            { headers: { Authorization: `Bearer ${process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}` } },
+            (res) => {
+              let data = "";
+              res.on("data", (chunk) => (data += chunk));
+              res.on("end", () => {
+                if (res.statusCode !== 200) {
+                  console.error("OIDC request failed:", res.statusCode, data);
+                  process.exit(1);
+                }
+                const token = JSON.parse(data).value;
+                const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString("utf8"));
+                const fields = [
+                  "aud",
+                  "iss",
+                  "sub",
+                  "repository",
+                  "repository_owner",
+                  "workflow",
+                  "job_workflow_ref",
+                  "ref",
+                  "sha",
+                  "actor"
+                ];
+                for (const field of fields) {
+                  if (payload[field]) {
+                    console.log(`${field}: ${payload[field]}`);
+                  }
+                }
+              });
+            }
+          );
+          req.on("error", (err) => {
+            console.error(err);
+            process.exit(1);
+          });
+          NODE
+
       - name: Commit changes
         if: steps.diff.outputs.changed == 'true'
         run: |
