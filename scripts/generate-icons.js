@@ -13,7 +13,10 @@ if (!repoPath) {
 const styles = [
   { name: "rounded", upstreamDir: "materialsymbolsrounded" },
   { name: "outlined", upstreamDir: "materialsymbolsoutlined" },
-  { name: "sharp", upstreamDir: "materialsymbolssharp" }
+  { name: "sharp", upstreamDir: "materialsymbolssharp" },
+  { name: "rounded-filled", upstreamDir: "materialsymbolsrounded", filled: true },
+  { name: "outlined-filled", upstreamDir: "materialsymbolsoutlined", filled: true },
+  { name: "sharp-filled", upstreamDir: "materialsymbolssharp", filled: true }
 ];
 
 const sourceRoot = path.resolve(repoPath, "symbols", "web");
@@ -57,11 +60,18 @@ for (const style of styles) {
         continue;
       }
 
-      if (isFill1File(fileName) || isVariantFile(fileName)) {
+      if (isVariantFile(fileName)) {
         continue;
       }
 
-      const iconName = fileName.replace(/_24px\.svg$/, "");
+      const isFilled = isFill1File(fileName);
+      if (style.filled) {
+        if (!isFilled) continue;
+      } else {
+        if (isFilled) continue;
+      }
+
+      const iconName = fileName.replace(/_24px\.svg$/, "").replace(/_fill1/, "");
       const srcPath = path.join(styleDir, fileName);
       const destPath = path.join(styleOutDir, `${iconName}.svg`);
 
