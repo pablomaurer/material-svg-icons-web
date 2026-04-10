@@ -529,6 +529,7 @@ export type IconName =
   | "body_fat"
   | "body_system"
   | "bolt"
+  | "bolt_boost"
   | "bomb"
   | "book"
   | "book_2"
