@@ -3286,6 +3286,7 @@ const ICON_NAMES = [
   "sim_card",
   "sim_card_download",
   "simulation",
+  "single_arrow",
   "single_bed",
   "sip",
   "siren",
