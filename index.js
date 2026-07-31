@@ -1803,6 +1803,7 @@ const ICON_NAMES = [
   "high_chair",
   "high_density",
   "high_quality",
+  "high_quality_off",
   "high_res",
   "highlight",
   "highlight_keyboard_focus",
